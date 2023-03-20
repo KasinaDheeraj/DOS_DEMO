@@ -24,3 +24,9 @@ public class ServerDriver {
         }
     }
 }
+/*
+ * Create a connection between systems with LAN/Router.
+ * Create 6/40 DOS network.
+ * Create client connections with IP Addresses.
+ * When a threshold value is crossed for clients then blocking based on IP addresses.
+ */
