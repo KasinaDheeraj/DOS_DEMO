@@ -16,6 +16,7 @@ public class ClientThread implements Runnable {
     @Override
     public void run() {
         try {
+
             while (true) {
                 String message = inputStream.readLine();
                 System.out.println(message);
@@ -24,6 +25,7 @@ public class ClientThread implements Runnable {
             System.out.println("You left the Server");
         } catch (IOException exception) {
             exception.printStackTrace();
+            System.out.println(exception.getMessage());
         } finally {
             try {
                 inputStream.close();

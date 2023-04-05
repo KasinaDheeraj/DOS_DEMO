@@ -1,56 +1,60 @@
 package com.multi;
 
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-public class AttackerDriver {
+import static com.multi.ServerDriver.MAX_PACKET_SIZE;
 
-    public static void main(String[] args) {
+//public class AttackerDriver {
+public class AttackerDriver implements Runnable {
 
-        char[] chars = new char[1024*1024*950];
-        // Optional step - unnecessary if you're happy with the array being full of \0
-        Arrays.fill(chars,'I');
-        final String TEXT5MB=new String(chars);
+    private static final SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        final String msg=TEXT5MB;
+//    public static void main(String[] args) {
+    public void run(){
 
+        final String msg=MAX_PACKET_SIZE;
 
-        try (Socket socket = new Socket("localhost", 5000)) {
-            // Sending message to server.
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+        try (Socket socket = new Socket("localhost", 5000)){;//, InetAddress.getByName("127.0.0.1"),5000+instances)) {
 
             AttackerThread threadAttacker = new AttackerThread(socket);
             new Thread(threadAttacker).start();
 
+            // Sending message to server.
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+            writer.println("Node "+ ": has joined Server.");
 
-
-            writer.println("Node "
-                    + ": has joined Server.");
             do {
                 String message = ("Attacker : ");
 
-                if (msg.equalsIgnoreCase("exit")) {
-                    writer.println("exit");
-                    break;
-                }
-                //System.out.println("Enter number of loops : ");
-                long loops = 1000000;//sc.nextLong();
-
-                //for(long i=0;i<loops;i++)
-                while(true)
+//                while(true) {
 //                    new Thread(new Runnable() {
-//                        @Override public void run() {
-//                            // do stuff in this thread
+//                        @Override
+//                        public void run() {
+//
+//                            // Printing Timestamp.
+//                            System.out.println(sdf3.format(new Timestamp(System.currentTimeMillis())));
+//
+//                            // Send message to Server.
 //                            writer.println(message + msg);
 //                        }
 //                    }).start();
-//                    TimeUnit.SECONDS.sleep(10);
-                writer.println(message + msg);
+//                    TimeUnit.SECONDS.sleep(20);
+//                }
 
+                // Printing Timestamp.
+                System.out.println(sdf3.format(new Timestamp(System.currentTimeMillis())));
+
+
+                writer.println(message + msg);
 
             } while (!msg.equalsIgnoreCase("exit"));
         } catch (Exception e) {

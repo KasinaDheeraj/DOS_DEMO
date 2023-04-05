@@ -3,45 +3,52 @@ package com.multi;
 
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Arrays;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
+import static com.multi.ServerDriver.MAX_PACKET_SIZE;
+
 public class ClientDriver {
+
+    private static final SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public static void main(String[] args) {
 
-        char[] chars = new char[1024*1024*512];
-        // Optional step - unnecessary if you're happy with the array being full of \0
-        Arrays.fill(chars,'I');
-        final String TEXT5MB=new String(chars);
-
-        String name="";
         String msg="";
         Scanner sc=new Scanner(System.in);
-        System.out.println("Please enter node name to join the Server : ");
-        msg=sc.nextLine();
-        name=msg;
 
         try (Socket socket = new Socket("localhost", 5000)) {
-            // Sending message to server.
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
 
             ClientThread threadClient = new ClientThread(socket);
             new Thread(threadClient).start();
 
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
             writer.println("Node "+msg + ": has joined Server.");
             do {
-                String message = (name + " : ");
+
+                if(!socket.isConnected())throw new Exception("Not Connected!");
+
+                System.out.println("___"+sdf3.format(new Timestamp(System.currentTimeMillis())));
+                // Read input.
                 msg = sc.nextLine();
                 if (msg.equalsIgnoreCase("exit")) {
                     writer.println("exit");
                     break;
                 }
 
-                writer.println(message + TEXT5MB);
+                // Printing Timestamp.
+                System.out.println(sdf3.format(new Timestamp(System.currentTimeMillis())));
+
+                if(!socket.isConnected())throw new Exception("Not Connected!");
+                // Sending message to server.
+                writer.println(msg);
 
             } while (!msg.equalsIgnoreCase("exit"));
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
         }
+        System.out.println("Bye Bye!");
     }
 }

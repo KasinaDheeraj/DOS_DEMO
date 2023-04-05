@@ -2,6 +2,8 @@ package com.multi;
 
 import java.io.*;
 import java.net.*;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ServerThread extends Thread {
@@ -9,6 +11,9 @@ public class ServerThread extends Thread {
     private Socket socket;
     private ArrayList<Socket> clients;
     private HashMap<Socket, String> clientNameList;
+    private final String Address;
+    private static final SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     HashMap<Socket, Integer> requestCount;
 
     public ServerThread(Socket socket, ArrayList<Socket> clients, HashMap<Socket, String> clientNameList,HashMap<Socket, Integer> requestCount) {
@@ -16,6 +21,7 @@ public class ServerThread extends Thread {
         this.clients = clients;
         this.clientNameList = clientNameList;
         this.requestCount=requestCount;
+        this.Address=socket.getRemoteSocketAddress().toString();
     }
 
     @Override
@@ -28,31 +34,38 @@ public class ServerThread extends Thread {
                 // Read messages from client.
                 String outputString = input.readLine();
 
+                String ack = "ACK ";
+
                 // For maintaining count of requests from this client.
                 requestCount.put(socket,requestCount.getOrDefault(socket,0)+1);
 
                 if (outputString.equalsIgnoreCase("exit")) {
                     throw new SocketException();
                 }
+
+                // If it is a New Connection.
                 if (!clientNameList.containsKey(socket)) {
-                    String[] messageString = outputString.split(":", 2);
-                    clientNameList.put(socket, messageString[0]);
-                    String message=messageString[0] + messageString[1]+"("+requestCount.getOrDefault(socket,0).toString()+")";
+                    clientNameList.put(socket,Address);
+                    String message="("+Address+")"+ " has joined Server"+"("+requestCount.getOrDefault(socket,0).toString()+")";
                     System.out.println(message);
+                    ack="CONNECTION ACK";
                 } else {
-                    String message=outputString+"("+requestCount.getOrDefault(socket,0).toString()+")";
+                    String message="("+Address+"): "+outputString+"("+requestCount.getOrDefault(socket,0).toString()+")";
                     System.out.println(message);
                 }
 
+                // Adding Timestamp.
+                ack=ack+" ( "+sdf3.format(new Timestamp(System.currentTimeMillis()))+" )\n";
+
+
                 //Sending acknowledge message to client.
-                String ack = "ACK\n";
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                 printWriter.println(ack);
                 System.out.println("ACK sent to the client\n");
 
             }
         } catch (SocketException e) {
-            String printMessage = clientNameList.get(socket) + " has been disconnected";
+            String printMessage = clientNameList.get(socket) + " has been disconnected.\n";
             System.out.println(printMessage);
             clients.remove(socket);
             clientNameList.remove(socket);
