@@ -16,12 +16,15 @@ public class ServerThread extends Thread {
 
     HashMap<Socket, Integer> requestCount;
 
-    public ServerThread(Socket socket, ArrayList<Socket> clients, HashMap<Socket, String> clientNameList,HashMap<Socket, Integer> requestCount) {
+    FileWriter fileWriter;
+
+    public ServerThread(Socket socket, ArrayList<Socket> clients, HashMap<Socket, String> clientNameList,HashMap<Socket, Integer> requestCount,FileWriter myWriter) {
         this.socket = socket;
         this.clients = clients;
         this.clientNameList = clientNameList;
         this.requestCount=requestCount;
         this.Address=socket.getRemoteSocketAddress().toString();
+        this.fileWriter=myWriter;
     }
 
     @Override
@@ -47,10 +50,14 @@ public class ServerThread extends Thread {
                 if (!clientNameList.containsKey(socket)) {
                     clientNameList.put(socket,Address);
                     String message="("+Address+")"+ " has joined Server"+"("+requestCount.getOrDefault(socket,0).toString()+")";
+                    fileWriter.append(clientNameList.get(socket)+" ( "+sdf3.format(new Timestamp(System.currentTimeMillis()))+" )"+" : "+requestCount.get(socket)+"\n");
+                    fileWriter.flush();
                     System.out.println(message);
                     ack="CONNECTION ACK";
                 } else {
                     String message="("+Address+"): "+outputString+"("+requestCount.getOrDefault(socket,0).toString()+")";
+                    fileWriter.append(clientNameList.get(socket)+" ( "+sdf3.format(new Timestamp(System.currentTimeMillis()))+" )"+" : "+requestCount.get(socket)+"\n");
+                    fileWriter.flush();
                     System.out.println(message);
                 }
 
@@ -73,5 +80,4 @@ public class ServerThread extends Thread {
             System.out.println(e.getStackTrace());
         }
     }
-
 }

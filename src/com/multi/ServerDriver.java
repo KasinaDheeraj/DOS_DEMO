@@ -1,5 +1,8 @@
 package com.multi;
 
+import java.io.FileWriter;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,25 +27,25 @@ public class ServerDriver {
         ArrayList<Socket> threadList = new ArrayList<>();
         HashMap<Socket, String> clientNameList = new HashMap<Socket, String>();
         HashMap<Socket, Integer> requestCount=new HashMap<>();
+
         try (ServerSocket serversocket = new ServerSocket(5000)) {
-            System.out.println("Started Server:");
+            FileWriter myWriter = new FileWriter("C:\\Users\\Dheeru\\Desktop\\8th Sem\\Final year project\\ServerLog.txt",false);
+            myWriter.write("Server Started:\n");
+            myWriter.flush();
+
+            System.out.println("Server Started:");
             while (true) {
                 Socket socket = serversocket.accept();
                 threadList.add(socket);
-                ServerThread ThreadServer = new ServerThread(socket, threadList, clientNameList,requestCount);
+                ServerThread ThreadServer = new ServerThread(socket, threadList, clientNameList,requestCount,myWriter);
                 ThreadServer.start();
             }
+
         } catch (Exception e) {
             System.out.println(e.getStackTrace());
         }
     }
 }
-/*
- * Create a connection between systems with LAN/Router.
- * Create 6/40 DOS network.
- * -- Create client connections with IP Addresses.
- * -- When a threshold value is crossed for clients then blocking based on IP addresses.
- */
 
 
 /* Error:

@@ -2,7 +2,7 @@ package com.multi;
 
 
 import java.io.PrintWriter;
-import java.net.Socket;
+import java.net.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
@@ -18,7 +18,7 @@ public class ClientDriver {
         String msg="";
         Scanner sc=new Scanner(System.in);
 
-        try (Socket socket = new Socket("localhost", 5000)) {
+        try (Socket socket = new Socket("localhost",5000)) {
 
             ClientThread threadClient = new ClientThread(socket);
             new Thread(threadClient).start();
@@ -29,7 +29,7 @@ public class ClientDriver {
 
                 if(!socket.isConnected())throw new Exception("Not Connected!");
 
-                System.out.println("___"+sdf3.format(new Timestamp(System.currentTimeMillis())));
+                System.out.println("Ready To Take Input : "+sdf3.format(new Timestamp(System.currentTimeMillis())));
                 // Read input.
                 msg = sc.nextLine();
                 if (msg.equalsIgnoreCase("exit")) {
@@ -49,6 +49,5 @@ public class ClientDriver {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
-        System.out.println("Bye Bye!");
     }
 }

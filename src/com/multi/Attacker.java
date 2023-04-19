@@ -8,7 +8,7 @@ public class Attacker {
 
     public static void main(String[] args) {
 
-        int i=1300;
+        int i=400;//1325;
         while(i!=0){
             try {
                 Socket socket = new Socket("localhost", 5000);
